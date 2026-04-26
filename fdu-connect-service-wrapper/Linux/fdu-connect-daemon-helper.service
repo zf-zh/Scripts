@@ -1,0 +1,12 @@
+[Unit]
+Description=fdu-connect daemon helper
+After=network-online.target nftables.service iptables.service
+
+[Service]
+Type=simple
+ExecStart=/home/jz2024/.config/fdu-connect/fdu-connect --config /home/jz2024/.config/fdu-connect/config-fdu-connect.toml
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
