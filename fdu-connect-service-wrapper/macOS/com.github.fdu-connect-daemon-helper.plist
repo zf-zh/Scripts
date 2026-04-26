@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+    <dict>
+        <key>Label</key>
+        <string>com.github.fdu-connect-daemon-helper</string>
+        <key>RunAtLoad</key>
+        <false/>
+        <key>KeepAlive</key>
+        <dict>
+            <key>Crashed</key>
+            <true/>
+        </dict>
+        <key>ProgramArguments</key>
+        <array>
+            <string>/Users/jz2025/.config/fdu-connect/fdu-connect</string>
+            <string>--config</string>
+            <string>/Users/jz2025/.config/fdu-connect/config-fdu-connect.toml</string>
+        </array>
+    </dict>
+</plist> 
