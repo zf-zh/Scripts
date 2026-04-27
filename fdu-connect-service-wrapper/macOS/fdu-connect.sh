@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Check for root permissions
-if [ "$(whoami)" != "root" ]
+if [ "$(id -u)" != 0 ]
 then
     echo "$0: Permission denied, please try again with \"sudo\"" >&2
     exit 1
@@ -10,10 +10,11 @@ fi
 
 # Define variables
 ## Default
+USER_HOME="/Users/jz2025"
 DAEMON_NAME_DEFAULT="com.github.fdu-connect-daemon-helper"
-DAEMON_PATH_DEFAULT="/Users/jz2025/.config/fdu-connect/com.github.fdu-connect-daemon-helper.plist"
-CONFIG_PATH_DEFAULT="/Users/jz2025/.config/fdu-connect/config-fdu-connect.toml"
-EXEC_PATH_DEFAULT="/Users/jz2025/.config/fdu-connect/fdu-connect"
+DAEMON_PATH_DEFAULT="${USER_HOME}/.config/fdu-connect/com.github.fdu-connect-daemon-helper.plist"
+CONFIG_PATH_DEFAULT="${USER_HOME}/.config/fdu-connect/config-fdu-connect.toml"
+EXEC_PATH_DEFAULT="${USER_HOME}/.config/fdu-connect/fdu-connect"
 
 ## Specified
 DAEMON_NAME="com.github.fdu-connect-daemon-helper"
@@ -106,6 +107,12 @@ then
                 else
                     CONFIG_PATH="$2"
                 fi
+                CONFIG_PATH="$(realpath "$CONFIG_PATH")"
+                if [ ! -f "$CONFIG_PATH" ]
+                then
+                    echo "$0 start: Configuration file \"$CONFIG_PATH\" does not exist" >&2
+                    exit 1
+                fi
                 ;;
             -e | --exec)
                 DAEMON_TYPE=1
@@ -126,6 +133,12 @@ then
                     EXEC_PATH="$(cat /dev/stdin)"
                 else
                     EXEC_PATH="$2"
+                fi
+                EXEC_PATH="$(realpath "$EXEC_PATH")"
+                if [ ! -f "$EXEC_PATH" ]
+                then
+                    echo "$0 start: Executable file \"$EXEC_PATH\" does not exist" >&2
+                    exit 1
                 fi
                 ;;
             *)
@@ -218,26 +231,20 @@ start_daemon() {
         return 1
     fi
     # Generate the plist file
-    generate_plist
-    if [ $? -ne 0 ]
-    then
+    generate_plist || {
         echo "$0: Failed to generate plist file" >&2
         return 1
-    fi
+    }
     # Load the daemon
-    launchctl load "$DAEMON_PATH"
-    if [ $? -ne 0 ]
-    then
+    launchctl load "$DAEMON_PATH" || {
         echo "$0: Failed to load \"$DAEMON_PATH\"" >&2
         return 1
-    fi
+    }
     # Start the daemon
-    launchctl start "$DAEMON_NAME"
-    if [ $? -ne 0 ]
-    then
+    launchctl start "$DAEMON_NAME" || {
         echo "$0: Failed to start \"$DAEMON_NAME\"" >&2
         return 1
-    fi
+    }
     return 0
 }
 
@@ -255,26 +262,20 @@ stop_daemon() {
         return 1
     fi
     # Stop the daemon
-    launchctl stop "$DAEMON_NAME"
-    if [ $? -ne 0 ]
-    then
+    launchctl stop "$DAEMON_NAME" || {
         echo "$0: Failed to stop \"$DAEMON_NAME\"" >&2
         return 1
-    fi
+    }
     # Unload the daemon
-    launchctl unload "$DAEMON_PATH"
-    if [ $? -ne 0 ]
-    then
+    launchctl unload "$DAEMON_PATH" || {
         echo "$0: Failed to unload \"$DAEMON_PATH\"" >&2
         return 1
-    fi
+    }
     # Remove the daemon plist file
-    rm "$DAEMON_PATH"
-    if [ $? -ne 0 ]
-    then
+    rm "$DAEMON_PATH" || {
         echo "$0: Failed to remove \"$DAEMON_PATH\", please remove it manually" >&2
         return 1
-    fi
+    }
     return 0
 }
 
@@ -293,21 +294,17 @@ restart_daemon() {
         return $?
     fi
     # Stop the daemon
-    launchctl stop "$DAEMON_NAME"
-    if [ $? -ne 0 ]
-    then
+    launchctl stop "$DAEMON_NAME" || {
         echo "$0: Failed to stop \"$DAEMON_NAME\"" >&2
         return 1
-    fi
+    }
     # Wait for a moment to ensure the daemon has stopped
     sleep 1
     # Start the daemon
-    launchctl start "$DAEMON_NAME"
-    if [ $? -ne 0 ]
-    then
+    launchctl start "$DAEMON_NAME" || {
         echo "$0: Failed to start \"$DAEMON_NAME\"" >&2
         return 1
-    fi
+    }
     return 0
 }
 
