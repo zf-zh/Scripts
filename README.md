@@ -6,7 +6,6 @@ This repsitory contains some useless scripts.
 
 A wrapper for [fdu-connect](https://github.com/AkiraSalvare/fdu-connect) to run it as a service. It is designed to be used with [systemd](https://systemd.io) on Linux or [launchd](https://developer.apple.com/documentation/xpc/launchd) on macOS.
 
-
 ## bilibili-decoder
 
 Converts Bilibili offline downloads into regular, playable `.mp4` files that can be opened in any video player. Point it at the folder Bilibili downloaded into, pick an output folder, and it converts everything in one batch. It requires `ffmpeg` to be installed and available in the system `PATH`.
@@ -20,3 +19,6 @@ Two versions are available:
     - `-k`, `--keep` — keep the original source files after a successful merge. Without it, source files are deleted once the `.mp4` is written.
     - `-h`, `--help` — print the usage summary and exit.
 
+## svg2icns
+
+Converts an SVG file into a macOS ICNS icon file. It requires `rsvg-convert`, `magick`, `sips`, and `iconutil` to be available in the system `PATH`.
